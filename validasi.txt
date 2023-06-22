@@ -1,0 +1,39 @@
+<?php
+                if(!empty(session()->getFlashdata('success'))){?>
+                  <div class="alert alert-success">
+                    <?= session()->getFlashdata('success'); ?>
+                  </div>
+                <?php }?>
+                <?php
+                  $inputs = session()->getFlashdata('inputs');
+                  $errors = session()->getFlashdata('errors');
+                  if(!empty($errors)){?>
+                    <div class="alert alert-danger">
+                      !! Kesalahan Input Data :
+                      <ul>
+                        <?php foreach ($errors as $error) {?>
+                          <li><?= esc($error)?></li>
+                        <?php } ?>
+                      </ul>
+                    </div>
+                  <?php }?>
+
+public function store()
+	{
+		$validation = \Config\Services::validation();
+		$data=[
+				'kode_kemendagri' => $this->request->getPost('kode_kemendagri'),
+				'kecamatan' => $this->request->getPost('kecamatan'),
+		];
+
+		if ($validation-> run($data, 'kecamatan')==false){
+			session()->setFlashdata('inputs', $this->request->getPost());
+			session()->setFlashdata('errors', $validation->getErrors());
+			return redirect()->to(base_url('/kecamatan/add'));
+		}else{
+			$this->M_kecamatan->addKecamatan($data);
+			session()->setFlashdata('message', 'Data Berhasil Ditambahkan');
+			return redirect()->to(base_url('kecamatan'));
+		}
+		
+	}
